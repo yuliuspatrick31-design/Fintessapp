@@ -148,8 +148,8 @@ export default function RunningOCRModal({ onClose }) {
             </div>
 
             <div style={{ display: 'flex', gap: 8 }}>
-              <button className="btn btn-secondary" style={{ flex: 1 }} onClick={() => setPreview(null)}>Retake</button>
-              <button className="btn btn-primary" style={{ flex: 2, background: 'var(--blue)' }} onClick={handleSave}>Confirm & Save</button>
+              <button className="btn btn-secondary" style={{ flex: 1, padding: '12px' }} onClick={() => setPreview(null)}>RETAKE</button>
+              <button className="btn btn-primary" style={{ flex: 2, padding: '12px', background: 'var(--accent)', color: 'var(--bg)' }} onClick={handleSave}>CONFIRM & SAVE</button>
             </div>
           </div>
         )}

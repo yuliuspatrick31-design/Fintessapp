@@ -96,8 +96,17 @@ export default function RunningTracker() {
           <h2>Running Tracker</h2>
           <p>Log runs, track pace and distance</p>
         </div>
-        <button className="btn btn-secondary btn-sm" onClick={() => setShowOCR(true)}>
-          📸 Scan
+        <button 
+          className="btn btn-secondary btn-sm" 
+          onClick={() => setShowOCR(true)}
+          style={{ 
+            display: 'flex', alignItems: 'center', gap: 6,
+            background: 'var(--surface-3)', border: '1px solid var(--border-3)',
+            padding: '6px 12px', fontSize: 11, fontWeight: 800,
+            color: 'var(--text)'
+          }}
+        >
+          📸 SCAN
         </button>
       </div>
 
