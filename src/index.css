@@ -709,6 +709,22 @@ select.form-input {
 .cal-cell.other-month { opacity: 0.3; cursor: default; }
 .cal-cell.other-month:hover { transform: none; }
 .cal-cell.is-today { border-color: rgba(var(--accent-rgb),0.45); box-shadow: 0 0 10px rgba(var(--accent-rgb),0.12); }
+.form-input-clean {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-family: inherit;
+  padding: 0;
+}
+.form-input-sub {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-weight: 600;
+}
+.form-input-sub:focus { color: var(--accent); }
 .cal-cell.has-gym { border-color: rgba(var(--accent-rgb),0.25); background: rgba(var(--accent-rgb),0.05); }
 .cal-cell.has-run { border-color: rgba(var(--blue-rgb),0.25); background: rgba(var(--blue-rgb),0.05); }
 .cal-cell.has-rest { opacity: 0.6; }

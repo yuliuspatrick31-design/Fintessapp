@@ -282,31 +282,76 @@ function DayEditModal({ day, onSave, onClose }) {
           {form.type === 'gym' && (
             <div>
               <label className="form-label" style={{ marginBottom: 6, display: 'block' }}>Exercises</label>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 8 }}>
-                {form.exercises.map(ex => (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 10 }}>
+                {form.exercises.map((ex, idx) => (
                   <div key={ex.id} style={{
-                    display: 'flex', alignItems: 'center', gap: 8,
-                    padding: '7px 10px', background: 'var(--surface-2)',
-                    border: '1px solid var(--border)', borderRadius: 8,
+                    display: 'flex', alignItems: 'center', gap: 6,
+                    padding: '4px 8px', background: 'var(--surface-2)',
+                    border: '1px solid var(--border)', borderRadius: 10,
                   }}>
-                    <span style={{ flex: 1, fontSize: 11 }}>{ex.name}</span>
-                    <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>{ex.sets}×{ex.reps}</span>
-                    <button className="btn btn-ghost btn-icon text-danger" style={{ padding: 3 }} onClick={() => removeEx(ex.id)}>✕</button>
+                    <input 
+                      className="form-input-sub" 
+                      value={ex.name} 
+                      style={{ flex: 1, background: 'transparent', border: 'none', padding: '4px 0', fontSize: 11, fontWeight: 600 }}
+                      onChange={e => {
+                        const newExs = [...form.exercises];
+                        newExs[idx] = { ...newExs[idx], name: e.target.value };
+                        setForm(f => ({ ...f, exercises: newExs }));
+                      }}
+                    />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 2, background: 'var(--bg-card)', padding: '2px 6px', borderRadius: 6, border: '1px solid var(--border)' }}>
+                      <input 
+                        type="number" 
+                        value={ex.sets} 
+                        className="form-input-clean" 
+                        style={{ width: 20, textAlign: 'center', fontSize: 10 }}
+                        onChange={e => {
+                          const newExs = [...form.exercises];
+                          newExs[idx] = { ...newExs[idx], sets: +e.target.value };
+                          setForm(f => ({ ...f, exercises: newExs }));
+                        }}
+                      />
+                      <span style={{ fontSize: 9, opacity: 0.5 }}>×</span>
+                      <input 
+                        type="number" 
+                        value={ex.reps} 
+                        className="form-input-clean" 
+                        style={{ width: 20, textAlign: 'center', fontSize: 10 }}
+                        onChange={e => {
+                          const newExs = [...form.exercises];
+                          newExs[idx] = { ...newExs[idx], reps: +e.target.value };
+                          setForm(f => ({ ...f, exercises: newExs }));
+                        }}
+                      />
+                    </div>
+                    <button className="btn btn-ghost btn-icon" style={{ color: 'var(--danger)', padding: 4 }} onClick={() => removeEx(ex.id)}>✕</button>
                   </div>
                 ))}
               </div>
+
               {/* Add exercise inline */}
-              <div style={{ display: 'flex', gap: 5 }}>
-                <input className="form-input" placeholder="Exercise name" value={newEx.name}
+              <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                <input 
+                  className="form-input" 
+                  placeholder="Exercise name" 
+                  value={newEx.name}
                   onChange={e => setNewEx(n => ({ ...n, name: e.target.value }))}
-                  style={{ flex: 2 }}
+                  style={{ flex: 1, fontSize: 11 }}
                   onKeyDown={e => e.key === 'Enter' && addEx()}
                 />
-                <input type="number" className="form-input" value={newEx.sets} min="1"
-                  onChange={e => setNewEx(n => ({ ...n, sets: e.target.value }))} style={{ width: 52 }} placeholder="Sets" />
-                <input type="number" className="form-input" value={newEx.reps} min="1"
-                  onChange={e => setNewEx(n => ({ ...n, reps: e.target.value }))} style={{ width: 52 }} placeholder="Reps" />
-                <button className="btn btn-primary btn-sm" onClick={addEx}>+</button>
+                <div style={{ display: 'flex', gap: 4, width: 90 }}>
+                  <input type="number" className="form-input" value={newEx.sets} min="1"
+                    onChange={e => setNewEx(n => ({ ...n, sets: e.target.value }))} style={{ width: '100%', textAlign: 'center', padding: '8px 4px' }} placeholder="S" />
+                  <input type="number" className="form-input" value={newEx.reps} min="1"
+                    onChange={e => setNewEx(n => ({ ...n, reps: e.target.value }))} style={{ width: '100%', textAlign: 'center', padding: '8px 4px' }} placeholder="R" />
+                </div>
+                <button 
+                  className="btn btn-primary" 
+                  onClick={addEx}
+                  style={{ width: 40, height: 36, padding: 0, justifyContent: 'center', flexShrink: 0 }}
+                >
+                  +
+                </button>
               </div>
             </div>
           )}
