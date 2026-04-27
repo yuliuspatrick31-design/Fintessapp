@@ -75,6 +75,7 @@ export function AppProvider({ children, userId }) {
   // ── Row mappers ───────────────────────────────────────────────
   const rowToSchedule = (row) => ({
     ...row,
+    title:               row.title || row.program_name || (row.type === 'run' ? 'Run' : row.type === 'rest' ? 'Rest Day' : 'Gym Session'),
     exercises:           row.exercises           || [],
     completedExercises:  row.completed_exercises  || [],
   });
@@ -88,7 +89,7 @@ export function AppProvider({ children, userId }) {
     completed:            day.completed           || false,
     completed_exercises:  day.completedExercises  || [],
     notes:                day.notes               || null,
-    program_name:         day.programName         || null,
+    program_name:         day.title               || day.programName || null,
   });
 
   // ── Gym Logs ───────────────────────────────────────────
