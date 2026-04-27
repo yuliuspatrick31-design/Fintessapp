@@ -299,24 +299,24 @@ function DayEditModal({ day, onSave, onClose }) {
                         setForm(f => ({ ...f, exercises: newExs }));
                       }}
                     />
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 2, background: 'var(--bg-card)', padding: '2px 6px', borderRadius: 6, border: '1px solid var(--border)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'var(--surface-3)', padding: '4px 10px', borderRadius: 8, border: '1px solid var(--border-2)' }}>
                       <input 
                         type="number" 
                         value={ex.sets} 
                         className="form-input-clean" 
-                        style={{ width: 20, textAlign: 'center', fontSize: 10 }}
+                        style={{ width: 22, textAlign: 'center', fontSize: 11, fontWeight: 700 }}
                         onChange={e => {
                           const newExs = [...form.exercises];
                           newExs[idx] = { ...newExs[idx], sets: +e.target.value };
                           setForm(f => ({ ...f, exercises: newExs }));
                         }}
                       />
-                      <span style={{ fontSize: 9, opacity: 0.5 }}>×</span>
+                      <span style={{ fontSize: 10, opacity: 0.4, fontWeight: 800 }}>×</span>
                       <input 
                         type="number" 
                         value={ex.reps} 
                         className="form-input-clean" 
-                        style={{ width: 20, textAlign: 'center', fontSize: 10 }}
+                        style={{ width: 22, textAlign: 'center', fontSize: 11, fontWeight: 700 }}
                         onChange={e => {
                           const newExs = [...form.exercises];
                           newExs[idx] = { ...newExs[idx], reps: +e.target.value };
@@ -324,31 +324,31 @@ function DayEditModal({ day, onSave, onClose }) {
                         }}
                       />
                     </div>
-                    <button className="btn btn-ghost btn-icon" style={{ color: 'var(--danger)', padding: 4 }} onClick={() => removeEx(ex.id)}>✕</button>
+                    <button className="btn btn-ghost btn-icon" style={{ color: 'var(--danger)', padding: 6 }} onClick={() => removeEx(ex.id)}>✕</button>
                   </div>
                 ))}
               </div>
 
               {/* Add exercise inline */}
-              <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                 <input 
                   className="form-input" 
                   placeholder="Exercise name" 
                   value={newEx.name}
                   onChange={e => setNewEx(n => ({ ...n, name: e.target.value }))}
-                  style={{ flex: 1, fontSize: 11 }}
+                  style={{ flex: 1, fontSize: 12, padding: '10px 14px' }}
                   onKeyDown={e => e.key === 'Enter' && addEx()}
                 />
-                <div style={{ display: 'flex', gap: 4, width: 90 }}>
+                <div style={{ display: 'flex', gap: 6, width: 100 }}>
                   <input type="number" className="form-input" value={newEx.sets} min="1"
-                    onChange={e => setNewEx(n => ({ ...n, sets: e.target.value }))} style={{ width: '100%', textAlign: 'center', padding: '8px 4px' }} placeholder="S" />
+                    onChange={e => setNewEx(n => ({ ...n, sets: e.target.value }))} style={{ width: '100%', textAlign: 'center', padding: '10px 4px', fontSize: 12 }} placeholder="S" />
                   <input type="number" className="form-input" value={newEx.reps} min="1"
-                    onChange={e => setNewEx(n => ({ ...n, reps: e.target.value }))} style={{ width: '100%', textAlign: 'center', padding: '8px 4px' }} placeholder="R" />
+                    onChange={e => setNewEx(n => ({ ...n, reps: e.target.value }))} style={{ width: '100%', textAlign: 'center', padding: '10px 4px', fontSize: 12 }} placeholder="R" />
                 </div>
                 <button 
                   className="btn btn-primary" 
                   onClick={addEx}
-                  style={{ width: 40, height: 36, padding: 0, justifyContent: 'center', flexShrink: 0 }}
+                  style={{ width: 42, height: 42, padding: 0, justifyContent: 'center', flexShrink: 0, borderRadius: 12 }}
                 >
                   +
                 </button>

@@ -709,20 +709,32 @@ select.form-input {
 .cal-cell.other-month { opacity: 0.3; cursor: default; }
 .cal-cell.other-month:hover { transform: none; }
 .cal-cell.is-today { border-color: rgba(var(--accent-rgb),0.45); box-shadow: 0 0 10px rgba(var(--accent-rgb),0.12); }
+/* Hide spin buttons for number inputs */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
 .form-input-clean {
   background: transparent;
   border: none;
   outline: none;
   color: var(--text);
   font-family: inherit;
-  padding: 0;
+  padding: 4px 2px;
+  min-width: 24px;
 }
 .form-input-sub {
   background: transparent;
   border: none;
   outline: none;
   color: var(--text);
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 12px;
 }
 .form-input-sub:focus { color: var(--accent); }
 .cal-cell.has-gym { border-color: rgba(var(--accent-rgb),0.25); background: rgba(var(--accent-rgb),0.05); }
