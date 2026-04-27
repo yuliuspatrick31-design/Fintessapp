@@ -27,11 +27,18 @@ const NAV_ITEMS = [
     id: 'programs', label: 'Programs', group: 'Analyze',
     icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>,
   },
+  {
+    id: 'settings', label: 'Settings', group: 'Account',
+    icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>,
+  },
 ];
 
-const GROUPS = ['Main', 'Track', 'Analyze'];
+const GROUPS = ['Main', 'Track', 'Analyze', 'Account'];
 
-export default function Sidebar({ page, setPage }) {
+export default function Sidebar({ page, setPage, user, onLogout }) {
+  const displayName = user?.user_metadata?.name || user?.email?.split('@')[0] || 'Athlete';
+  const initials = displayName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+
   return (
     <aside className="sidebar">
       <div className="sidebar-logo">
@@ -62,7 +69,25 @@ export default function Sidebar({ page, setPage }) {
         ))}
       </nav>
 
-      <div className="sidebar-footer">All data stored locally</div>
+      <div className="sidebar-user">
+        <div className="sidebar-avatar">{initials}</div>
+        <div className="sidebar-user-info">
+          <span className="sidebar-user-name">{displayName}</span>
+          <span className="sidebar-user-email">{user?.email}</span>
+        </div>
+        <button
+          id="btn-logout"
+          className="sidebar-logout"
+          onClick={onLogout}
+          title="Sign out"
+        >
+          <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+        </button>
+      </div>
     </aside>
   );
 }

@@ -1,108 +1,252 @@
-import { createContext, useContext } from 'react';
-import { useLocalStorage } from '../hooks/useLocalStorage';
+import { createContext, useContext, useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
 import { DEFAULT_EXERCISES } from '../data/exercises';
 
 const AppContext = createContext(null);
 
-export function AppProvider({ children }) {
-  const [gymLogs, setGymLogs] = useLocalStorage('ft_gymLogs', []);
-  const [runLogs, setRunLogs] = useLocalStorage('ft_runLogs', []);
-  const [exercises, setExercises] = useLocalStorage('ft_exercises', DEFAULT_EXERCISES);
-  const [schedule, setSchedule] = useLocalStorage('ft_schedule', []);
+// ── localStorage helpers for dev-bypass mode ───────────────
+const ls = {
+  get: (key, def) => { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch { return def; } },
+  set: (key, val) => { try { localStorage.setItem(key, JSON.stringify(val)); } catch {} },
+};
 
-  // ── Gym Logs ──────────────────────────────────────────────
-  const addGymLog = (log) => {
-    const entry = { ...log, id: crypto.randomUUID() };
-    setGymLogs(prev => [entry, ...prev]);
+export function AppProvider({ children, userId }) {
+  const isDev = userId === 'dev-bypass';
+
+  const [gymLogs,   setGymLogs]   = useState([]);
+  const [runLogs,   setRunLogs]   = useState([]);
+  const [exercises, setExercises] = useState([]);
+  const [schedule,  setSchedule]  = useState([]);
+  const [dbReady,   setDbReady]   = useState(false);
+
+  // ── Bootstrap: fetch all user data on mount ───────────────────
+  useEffect(() => {
+    if (!userId) return;
+    fetchAll();
+  }, [userId]);
+
+  async function fetchAll() {
+    setDbReady(false);
+
+    if (isDev) {
+      // ── Dev mode: use localStorage ──
+      setGymLogs(ls.get('dev_gymLogs', []));
+      setRunLogs(ls.get('dev_runLogs', []));
+      const ex = ls.get('dev_exercises', []);
+      setExercises(ex.length ? ex : DEFAULT_EXERCISES);
+      if (!ex.length) ls.set('dev_exercises', DEFAULT_EXERCISES);
+      setSchedule(ls.get('dev_schedule', []));
+      setDbReady(true);
+      return;
+    }
+
+    const [gymRes, runRes, exRes, schedRes] = await Promise.all([
+      supabase.from('fit_gym_logs').select('*').eq('user_id', userId).order('date', { ascending: false }),
+      supabase.from('fit_run_logs').select('*').eq('user_id', userId).order('date', { ascending: false }),
+      supabase.from('fit_exercises').select('*').eq('user_id', userId).order('created_at'),
+      supabase.from('fit_schedule').select('*').eq('user_id', userId).order('date'),
+    ]);
+
+    setGymLogs(gymRes.data || []);
+    setRunLogs(runRes.data || []);
+
+    // Seed default exercises if the user has none yet
+    let exData = exRes.data || [];
+    if (exData.length === 0) {
+      const toInsert = DEFAULT_EXERCISES.map(e => ({ ...e, user_id: userId }));
+      const { data: seeded } = await supabase.from('fit_exercises').insert(toInsert).select();
+      exData = seeded || DEFAULT_EXERCISES;
+    }
+    setExercises(exData);
+
+    setSchedule((schedRes.data || []).map(rowToSchedule));
+    setDbReady(true);
+  }
+
+  // ── Row mappers ───────────────────────────────────────────────
+  const rowToSchedule = (row) => ({
+    ...row,
+    exercises:           row.exercises           || [],
+    completedExercises:  row.completed_exercises  || [],
+  });
+
+  const scheduleToRow = (day) => ({
+    id:                   day.id,
+    user_id:              userId,
+    date:                 day.date,
+    type:                 day.type,
+    exercises:            day.exercises           || [],
+    completed:            day.completed           || false,
+    completed_exercises:  day.completedExercises  || [],
+    notes:                day.notes               || null,
+    program_name:         day.programName         || null,
+  });
+
+  // ── Gym Logs ───────────────────────────────────────────
+  const addGymLog = async (log) => {
+    if (isDev) {
+      const entry = { ...log, id: crypto.randomUUID() };
+      const next = [entry, ...gymLogs];
+      setGymLogs(next); ls.set('dev_gymLogs', next); return;
+    }
+    const entry = { ...log, user_id: userId };
+    const { data, error } = await supabase.from('fit_gym_logs').insert(entry).select().single();
+    if (!error && data) setGymLogs(prev => [data, ...prev]);
   };
-  const deleteGymLog = (id) => setGymLogs(prev => prev.filter(l => l.id !== id));
 
-  // ── Run Logs ──────────────────────────────────────────────
-  const addRunLog = (log) => {
-    const entry = { ...log, id: crypto.randomUUID() };
-    setRunLogs(prev => [entry, ...prev]);
+  const deleteGymLog = async (id) => {
+    if (isDev) {
+      const next = gymLogs.filter(l => l.id !== id);
+      setGymLogs(next); ls.set('dev_gymLogs', next); return;
+    }
+    await supabase.from('fit_gym_logs').delete().eq('id', id);
+    setGymLogs(prev => prev.filter(l => l.id !== id));
   };
-  const deleteRunLog = (id) => setRunLogs(prev => prev.filter(l => l.id !== id));
 
-  // ── Exercise Library ──────────────────────────────────────
-  const addExercise = (ex) => {
-    const entry = { ...ex, id: crypto.randomUUID() };
-    setExercises(prev => [...prev, entry]);
+  // ── Run Logs ───────────────────────────────────────────
+  const addRunLog = async (log) => {
+    if (isDev) {
+      const entry = { ...log, id: crypto.randomUUID() };
+      const next = [entry, ...runLogs];
+      setRunLogs(next); ls.set('dev_runLogs', next); return;
+    }
+    const entry = { ...log, user_id: userId };
+    const { data, error } = await supabase.from('fit_run_logs').insert(entry).select().single();
+    if (!error && data) setRunLogs(prev => [data, ...prev]);
+  };
+
+  const deleteRunLog = async (id) => {
+    if (isDev) {
+      const next = runLogs.filter(l => l.id !== id);
+      setRunLogs(next); ls.set('dev_runLogs', next); return;
+    }
+    await supabase.from('fit_run_logs').delete().eq('id', id);
+    setRunLogs(prev => prev.filter(l => l.id !== id));
+  };
+
+  // ── Exercise Library ────────────────────────────────────
+  const addExercise = async (ex) => {
+    if (isDev) {
+      const entry = { ...ex, id: ex.id || crypto.randomUUID() };
+      const next = [...exercises, entry];
+      setExercises(next); ls.set('dev_exercises', next); return entry;
+    }
+    const entry = { ...ex, id: ex.id || crypto.randomUUID(), user_id: userId };
+    const { data, error } = await supabase.from('fit_exercises').insert(entry).select().single();
+    if (!error && data) {
+      setExercises(prev => [...prev, data]);
+      return data;
+    }
     return entry;
   };
-  const updateExercise = (id, updates) =>
+
+  const updateExercise = async (id, updates) => {
+    if (isDev) {
+      const next = exercises.map(e => e.id === id ? { ...e, ...updates } : e);
+      setExercises(next); ls.set('dev_exercises', next); return;
+    }
+    await supabase.from('fit_exercises').update(updates).eq('id', id);
     setExercises(prev => prev.map(e => e.id === id ? { ...e, ...updates } : e));
-  const deleteExercise = (id) =>
+  };
+
+  const deleteExercise = async (id) => {
+    if (isDev) {
+      const next = exercises.filter(e => e.id !== id);
+      setExercises(next); ls.set('dev_exercises', next); return;
+    }
+    await supabase.from('fit_exercises').delete().eq('id', id);
     setExercises(prev => prev.filter(e => e.id !== id));
+  };
 
-  // ── Schedule ──────────────────────────────────────────────
-  const setSchedulePlan = (days) => setSchedule(days);
+  // ── Schedule ───────────────────────────────────────────
+  const setSchedulePlan = async (days) => {
+    if (isDev) { setSchedule(days); ls.set('dev_schedule', days); return; }
+    const rows = days.map(scheduleToRow);
+    const { data, error } = await supabase.from('fit_schedule').upsert(rows, { onConflict: 'id' }).select();
+    if (!error && data) setSchedule(data.map(rowToSchedule));
+    else setSchedule(days);
+  };
 
-  const updateScheduleDay = (id, updates) =>
-    setSchedule(prev => prev.map(d => d.id === id ? { ...d, ...updates } : d));
-
-  const deleteScheduleDay = (id) =>
-    setSchedule(prev => prev.filter(d => d.id !== id));
-
-  const clearSchedule = () => setSchedule([]);
-
-  const addScheduleDay = (day) => {
-    const entry = { ...day, id: crypto.randomUUID() };
+  const addScheduleDay = async (day) => {
+    const entry = { ...day, id: day.id || crypto.randomUUID(), completedExercises: day.completedExercises || [] };
+    if (isDev) {
+      const next = [...schedule.filter(d => d.date !== entry.date), entry]
+        .sort((a, b) => a.date.localeCompare(b.date));
+      setSchedule(next); ls.set('dev_schedule', next); return;
+    }
+    const row = scheduleToRow(entry);
+    const { data, error } = await supabase.from('fit_schedule').upsert(row, { onConflict: 'id' }).select().single();
+    const saved = !error && data ? rowToSchedule(data) : entry;
     setSchedule(prev => {
-      // Insert in date order, replacing if same date
-      const filtered = prev.filter(d => d.date !== entry.date);
-      return [...filtered, entry].sort((a, b) => a.date.localeCompare(b.date));
+      const filtered = prev.filter(d => d.date !== saved.date);
+      return [...filtered, saved].sort((a, b) => a.date.localeCompare(b.date));
     });
   };
 
-  /** Toggle a single exercise completed within a schedule day */
-  const toggleExerciseComplete = (dayId, exerciseId) => {
-    setSchedule(prev => prev.map(d => {
-      if (d.id !== dayId) return d;
-      const already = d.completedExercises.includes(exerciseId);
-      const completedExercises = already
-        ? d.completedExercises.filter(id => id !== exerciseId)
-        : [...d.completedExercises, exerciseId];
-      // Auto-complete day when all gym exercises are ticked
-      const allDone = d.exercises.length > 0 &&
-        completedExercises.length === d.exercises.length;
-      return { ...d, completedExercises, completed: allDone || d.completed };
-    }));
+  const updateScheduleDay = async (id, updates) => {
+    const current = schedule.find(d => d.id === id);
+    if (!current) return;
+    const merged = { ...current, ...updates };
+    if (isDev) {
+      const next = schedule.map(d => d.id === id ? merged : d);
+      setSchedule(next); ls.set('dev_schedule', next); return;
+    }
+    const row = scheduleToRow(merged);
+    await supabase.from('fit_schedule').update(row).eq('id', id);
+    setSchedule(prev => prev.map(d => d.id === id ? merged : d));
   };
 
-  /** Toggle whole day completed */
-  const toggleDayComplete = (dayId) => {
-    setSchedule(prev => prev.map(d => {
-      if (d.id !== dayId) return d;
-      const completed = !d.completed;
-      // If marking complete, tick all exercises too
-      const completedExercises = completed
-        ? d.exercises.map(e => e.id)
-        : [];
-      return { ...d, completed, completedExercises };
-    }));
+  const deleteScheduleDay = async (id) => {
+    if (isDev) {
+      const next = schedule.filter(d => d.id !== id);
+      setSchedule(next); ls.set('dev_schedule', next); return;
+    }
+    await supabase.from('fit_schedule').delete().eq('id', id);
+    setSchedule(prev => prev.filter(d => d.id !== id));
+  };
+
+  const clearSchedule = async () => {
+    if (isDev) { setSchedule([]); ls.set('dev_schedule', []); return; }
+    await supabase.from('fit_schedule').delete().eq('user_id', userId);
+    setSchedule([]);
+  };
+
+  const toggleExerciseComplete = async (dayId, exerciseId) => {
+    const day = schedule.find(d => d.id === dayId);
+    if (!day) return;
+    const already = day.completedExercises.includes(exerciseId);
+    const completedExercises = already
+      ? day.completedExercises.filter(id => id !== exerciseId)
+      : [...day.completedExercises, exerciseId];
+    const allDone = day.exercises.length > 0 && completedExercises.length === day.exercises.length;
+    const updated = { ...day, completedExercises, completed: allDone || day.completed };
+    if (isDev) {
+      const next = schedule.map(d => d.id === dayId ? updated : d);
+      setSchedule(next); ls.set('dev_schedule', next); return;
+    }
+    await supabase.from('fit_schedule').update(scheduleToRow(updated)).eq('id', dayId);
+    setSchedule(prev => prev.map(d => d.id === dayId ? updated : d));
+  };
+
+  const toggleDayComplete = async (dayId) => {
+    const day = schedule.find(d => d.id === dayId);
+    if (!day) return;
+    const completed = !day.completed;
+    const completedExercises = completed ? day.exercises.map(e => e.id) : [];
+    const updated = { ...day, completed, completedExercises };
+    await supabase.from('fit_schedule').update(scheduleToRow(updated)).eq('id', dayId);
+    setSchedule(prev => prev.map(d => d.id === dayId ? updated : d));
   };
 
   return (
     <AppContext.Provider value={{
-      gymLogs,
-      runLogs,
-      exercises,
-      schedule,
-      addGymLog,
-      deleteGymLog,
-      addRunLog,
-      deleteRunLog,
-      addExercise,
-      updateExercise,
-      deleteExercise,
-      setSchedulePlan,
-      updateScheduleDay,
-      deleteScheduleDay,
-      addScheduleDay,
-      clearSchedule,
-      toggleExerciseComplete,
-      toggleDayComplete,
+      gymLogs, runLogs, exercises, schedule, dbReady,
+      addGymLog, deleteGymLog,
+      addRunLog, deleteRunLog,
+      addExercise, updateExercise, deleteExercise,
+      setSchedulePlan, addScheduleDay, updateScheduleDay,
+      deleteScheduleDay, clearSchedule,
+      toggleExerciseComplete, toggleDayComplete,
     }}>
       {children}
     </AppContext.Provider>
