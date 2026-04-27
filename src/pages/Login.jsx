@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 export default function Login({ onLogin }) {
   const [mode, setMode]         = useState('login'); // 'login' | 'signup'
@@ -35,6 +35,10 @@ export default function Login({ onLogin }) {
     setLoading(true);
 
     try {
+      if (!isSupabaseConfigured) {
+        throw new Error('Supabase is not configured. Please add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your environment variables.');
+      }
+
       if (mode === 'signup') {
         if (!name.trim()) { setError('Please enter your name.'); setLoading(false); return; }
 
@@ -52,7 +56,12 @@ export default function Login({ onLogin }) {
         onLogin(data.user);
       }
     } catch (err) {
-      setError(err.message || 'Something went wrong. Please try again.');
+      console.error('Auth error:', err);
+      let msg = err.message || 'Something went wrong. Please try again.';
+      if (msg.includes('Load failed') || msg.includes('Failed to fetch')) {
+        msg = 'Connection failed. Please check if your Supabase environment variables are correctly set in Vercel.';
+      }
+      setError(msg);
     } finally {
       setLoading(false);
     }
