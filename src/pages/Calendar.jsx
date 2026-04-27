@@ -528,7 +528,7 @@ export default function Calendar() {
               ? 'Rest'
               : day.type === 'run'
               ? `${day.targetDistance || '?'}km`
-              : day.title.replace(' Day', '').replace(' Body', '').slice(0, 8)
+              : (day.title || 'Workout').replace(' Day', '').replace(' Body', '').slice(0, 8)
             : null;
 
           return (

@@ -72,8 +72,8 @@ export default class ErrorBoundary extends Component {
             <button
               onClick={() => window.location.reload()}
               style={{
-                background: 'linear-gradient(135deg, #a3e635, #65a30d)',
-                color: '#000',
+                background: 'var(--accent)',
+                color: 'var(--bg)',
                 border: 'none',
                 borderRadius: 10,
                 padding: '10px 24px',
@@ -81,6 +81,7 @@ export default class ErrorBoundary extends Component {
                 fontWeight: 700,
                 cursor: 'pointer',
                 width: '100%',
+                boxShadow: '0 4px 12px rgba(var(--accent-rgb), 0.25)',
               }}
             >
               Retry
