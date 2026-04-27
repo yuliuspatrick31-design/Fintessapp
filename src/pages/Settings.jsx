@@ -121,7 +121,7 @@ export default function Settings({ user, onLogout }) {
         <div className="settings-group">
 
           <div className="settings-row">
-            <div className="settings-row-icon" style={{ background: 'rgba(34,197,94,0.1)' }}>
+            <div className="settings-row-icon" style={{ background: 'rgba(var(--success-rgb),0.1)' }}>
               <svg width="14" height="14" fill="none" stroke="var(--success)" strokeWidth="2" viewBox="0 0 24 24">
                 <ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
               </svg>
@@ -155,7 +155,7 @@ export default function Settings({ user, onLogout }) {
         <div className="settings-group">
 
           <div className="settings-row">
-            <div className="settings-row-icon" style={{ background: 'rgba(245,158,11,0.1)' }}>
+            <div className="settings-row-icon" style={{ background: 'rgba(var(--warning-rgb),0.1)' }}>
               <svg width="14" height="14" fill="none" stroke="var(--warning)" strokeWidth="2" viewBox="0 0 24 24">
                 <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
               </svg>

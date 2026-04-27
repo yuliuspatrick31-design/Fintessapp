@@ -58,11 +58,11 @@ export default function RunningTracker() {
     datasets: [{
       label: 'km',
       data: last10.map(l => l.distance),
-      borderColor: '#3b82f6',
-      backgroundColor: 'rgba(59,130,246,0.08)',
+      borderColor: 'var(--blue)',
+      backgroundColor: 'rgba(var(--blue-rgb),0.08)',
       fill: true,
       tension: 0.4,
-      pointBackgroundColor: '#3b82f6',
+      pointBackgroundColor: 'var(--blue)',
       pointRadius: 4,
     }],
   };
@@ -96,7 +96,7 @@ export default function RunningTracker() {
       {/* ── Stats ─────────────────────────────────────────────── */}
       <div className="section">
         <div className="stat-grid">
-          <div className="stat-block" style={{ borderColor: 'rgba(59,130,246,0.25)', background: 'rgba(59,130,246,0.04)' }}>
+          <div className="stat-block" style={{ borderColor: 'rgba(var(--blue-rgb),0.25)', background: 'rgba(var(--blue-rgb),0.04)' }}>
             <div className="label">Total Distance</div>
             <div className="value" style={{ color: 'var(--blue)' }}>{stats.totalKm}<span className="unit">km</span></div>
           </div>

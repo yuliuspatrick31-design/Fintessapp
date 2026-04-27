@@ -37,7 +37,7 @@ export default class ErrorBoundary extends Component {
           }}>
             <div style={{
               width: 48, height: 48,
-              background: 'rgba(239,68,68,0.1)',
+              background: 'rgba(var(--danger-rgb),0.1)',
               borderRadius: '14px',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               margin: '0 auto 16px',
@@ -61,7 +61,7 @@ export default class ErrorBoundary extends Component {
               margin: '12px 0 20px',
               textAlign: 'left',
             }}>
-              <p style={{ color: 'rgba(163,230,53,0.8)', fontSize: 10, fontFamily: 'monospace', margin: 0, lineHeight: 1.8 }}>
+              <p style={{ color: 'rgba(var(--accent-rgb),0.8)', fontSize: 10, fontFamily: 'monospace', margin: 0, lineHeight: 1.8 }}>
                 VITE_SUPABASE_URL=https://...<br/>
                 VITE_SUPABASE_ANON_KEY=eyJ...
               </p>
@@ -86,7 +86,7 @@ export default class ErrorBoundary extends Component {
               Retry
             </button>
             {this.state.error && (
-              <p style={{ color: 'rgba(239,68,68,0.5)', fontSize: 10, marginTop: 16, fontFamily: 'monospace', wordBreak: 'break-all' }}>
+              <p style={{ color: 'rgba(var(--danger-rgb),0.5)', fontSize: 10, marginTop: 16, fontFamily: 'monospace', wordBreak: 'break-all' }}>
                 {this.state.error.message}
               </p>
             )}

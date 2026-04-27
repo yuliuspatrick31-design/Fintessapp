@@ -99,7 +99,7 @@ function TodayWorkout({ workout, setPage }) {
                       fontSize: 9, padding: '2px 7px', borderRadius: 20,
                       background: workout.completedExercises.includes(ex.id)
                         ? 'var(--accent-glow)' : 'rgba(255,255,255,0.06)',
-                      border: `1px solid ${workout.completedExercises.includes(ex.id) ? 'rgba(163,230,53,0.3)' : 'var(--border)'}`,
+                      border: `1px solid ${workout.completedExercises.includes(ex.id) ? 'rgba(var(--accent-rgb),0.3)' : 'var(--border)'}`,
                       color: workout.completedExercises.includes(ex.id) ? 'var(--accent)' : 'var(--text-muted)',
                     }}
                   >
@@ -125,7 +125,7 @@ function TodayWorkout({ workout, setPage }) {
           style={{
             background: color, color: workout.type === 'run' ? '#fff' : '#000',
             flexShrink: 0,
-            boxShadow: `0 0 12px ${workout.type === 'gym' ? 'rgba(163,230,53,0.25)' : 'rgba(59,130,246,0.25)'}`,
+            boxShadow: `0 0 12px ${workout.type === 'gym' ? 'rgba(var(--accent-rgb),0.25)' : 'rgba(var(--blue-rgb),0.25)'}`,
           }}
           onClick={() => setPage('calendar')}
         >
@@ -322,7 +322,7 @@ export default function Dashboard({ setPage }) {
               <Bar
                 data={{
                   labels: dayLabels,
-                  datasets: [{ data: gymVolumeData, backgroundColor: 'rgba(163,230,53,0.65)', borderRadius: 3, borderSkipped: false }],
+                  datasets: [{ data: gymVolumeData, backgroundColor: 'rgba(var(--accent-rgb),0.65)', borderRadius: 3, borderSkipped: false }],
                 }}
                 options={CHART_OPT}
               />
@@ -334,7 +334,7 @@ export default function Dashboard({ setPage }) {
               <Bar
                 data={{
                   labels: dayLabels,
-                  datasets: [{ data: runDistData, backgroundColor: 'rgba(59,130,246,0.65)', borderRadius: 3, borderSkipped: false }],
+                  datasets: [{ data: runDistData, backgroundColor: 'rgba(var(--blue-rgb),0.65)', borderRadius: 3, borderSkipped: false }],
                 }}
                 options={CHART_OPT}
               />

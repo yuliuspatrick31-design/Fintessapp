@@ -19,8 +19,8 @@ const CHART_OPT = {
 };
 
 const MUSCLE_COLORS = {
-  Chest: '#a3e635', Back: '#3b82f6', Shoulders: '#f59e0b',
-  Legs: '#ec4899', Arms: '#8b5cf6', Core: '#22c55e', Other: '#737373',
+  Chest: 'var(--accent)', Back: 'var(--blue)', Shoulders: 'var(--warning)',
+  Legs: 'var(--danger)', Arms: 'var(--purple)', Core: 'var(--success)', Other: '#737373',
 };
 
 export default function ProgressAnalytics() {
@@ -45,8 +45,8 @@ export default function ProgressAnalytics() {
       labels: dates.map(fmtDate),
       datasets: [{
         label: 'Volume (kg)', data: dates.map(d => grouped[d]),
-        borderColor: '#a3e635', backgroundColor: 'rgba(163,230,53,0.08)',
-        fill: true, tension: 0.4, pointBackgroundColor: '#a3e635', pointRadius: 4,
+        borderColor: 'var(--accent)', backgroundColor: 'rgba(var(--accent-rgb),0.08)',
+        fill: true, tension: 0.4, pointBackgroundColor: 'var(--accent)', pointRadius: 4,
       }],
     };
   }, [gymLogs, selectedExercise]);
@@ -273,7 +273,7 @@ export default function ProgressAnalytics() {
                 labels: weeklyRunData.map(w => w.label),
                 datasets: [{
                   data: weeklyRunData.map(w => w.dist),
-                  backgroundColor: 'rgba(59,130,246,0.65)',
+                  backgroundColor: 'rgba(var(--blue-rgb),0.65)',
                   borderRadius: 4, borderSkipped: false,
                 }],
               }} options={CHART_OPT} />

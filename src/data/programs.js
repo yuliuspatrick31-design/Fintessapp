@@ -7,7 +7,7 @@ export const PROGRAMS = [
     frequency: '6 days/week',
     level: 'Intermediate',
     goal: 'Hypertrophy',
-    color: '#a3e635',
+    color: 'accent',
     description:
       'The PPL split is one of the most popular hypertrophy programs. Each session targets a distinct movement pattern: pushing muscles (chest, shoulders, triceps), pulling muscles (back, biceps), and legs. This allows high weekly frequency per muscle with adequate recovery.',
     schedule: [
@@ -29,7 +29,7 @@ export const PROGRAMS = [
     frequency: '4 days/week',
     level: 'Beginner–Intermediate',
     goal: 'Strength & Size',
-    color: '#3b82f6',
+    color: 'blue',
     description:
       'Upper/Lower splits divide training into two session types. Upper body sessions train chest, back, shoulders, and arms. Lower body sessions focus on quads, hamstrings, glutes, and calves. Each is trained twice per week.',
     schedule: [
@@ -51,7 +51,7 @@ export const PROGRAMS = [
     frequency: '4 days/week',
     level: 'Intermediate–Advanced',
     goal: 'Strength',
-    color: '#f59e0b',
+    color: 'warning',
     description:
       'Jim Wendler\'s 5/3/1 is a slow, systematic strength program built on four main lifts: squat, bench, deadlift, and overhead press. Each is trained once per week with rotating rep schemes and submaximal loads.',
     schedule: [
@@ -73,7 +73,7 @@ export const PROGRAMS = [
     frequency: '6 days/week',
     level: 'Advanced',
     goal: 'Hypertrophy',
-    color: '#ec4899',
+    color: 'danger',
     description:
       'The classic program used by Arnold Schwarzenegger. It uses a 3-day rotating split (Chest+Back, Shoulders+Arms, Legs) performed twice per week. Very high volume and intensity.',
     schedule: [
@@ -95,7 +95,7 @@ export const PROGRAMS = [
     frequency: '3 days/week',
     level: 'Beginner',
     goal: 'General Fitness',
-    color: '#22c55e',
+    color: 'success',
     description:
       'A full-body program ideal for beginners. Each session trains every major muscle group with compound movements. High frequency per muscle (3×/week) accelerates neuromuscular adaptation and skill acquisition.',
     schedule: [
@@ -117,7 +117,7 @@ export const PROGRAMS = [
     frequency: '3–4 days/week',
     level: 'Beginner–Intermediate',
     goal: 'Strength & Size',
-    color: '#8b5cf6',
+    color: 'purple',
     description:
       'GZCLP (by Cody LeFever) is a tier-based linear progression program. T1 lifts (main compounds) use heavy weight for low reps. T2 (secondary compounds) use moderate weight. T3 (accessories) use isolation work for high reps.',
     schedule: [

@@ -147,7 +147,7 @@ function DayDetailModal({ day, onClose, onEdit, onDelete }) {
         {day.type === 'run' && (
           <div style={{
             background: 'var(--blue-glow)',
-            border: '1px solid rgba(59,130,246,0.2)',
+            border: '1px solid rgba(var(--blue-rgb),0.2)',
             borderRadius: 'var(--radius)',
             padding: '12px',
             display: 'flex', gap: 16,
@@ -459,7 +459,7 @@ export default function Calendar() {
           ) : (
             <button
               className="btn btn-secondary btn-sm"
-              style={{ color: 'var(--danger)', borderColor: 'rgba(239,68,68,0.25)' }}
+              style={{ color: 'var(--danger)', borderColor: 'rgba(var(--danger-rgb),0.25)' }}
               onClick={() => setConfirmClear(true)}
             >
               🗑 Clear Plan

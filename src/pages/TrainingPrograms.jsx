@@ -82,14 +82,14 @@ function GenerateModal({ onClose }) {
                 onClick={() => setProgramId(p.id)}
                 style={{
                   padding: '9px 6px', borderRadius: 10, cursor: 'pointer',
-                  border: `1px solid ${programId === p.id ? p.color : 'var(--border-2)'}`,
-                  background: programId === p.id ? `${p.color}14` : 'var(--surface)',
+                  border: `1px solid ${programId === p.id ? `var(--${p.color})` : 'var(--border-2)'}`,
+                  background: programId === p.id ? `rgba(var(--${p.color}-rgb), 0.08)` : 'var(--surface)',
                   transition: 'all 0.15s', textAlign: 'center',
                 }}
               >
                 <div style={{
                   fontSize: 11, fontWeight: 800,
-                  color: programId === p.id ? p.color : 'var(--text-muted)',
+                  color: programId === p.id ? `var(--${p.color})` : 'var(--text-muted)',
                 }}>{p.abbr}</div>
                 <div style={{ fontSize: 9, color: 'var(--text-dim)', marginTop: 2 }}>{p.frequency}</div>
               </button>
@@ -101,7 +101,7 @@ function GenerateModal({ onClose }) {
         {program && (
           <div style={{
             background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)',
-            borderLeft: `3px solid ${program.color}`,
+            borderLeft: `3px solid var(--${program.color})`,
             borderRadius: 9, padding: '9px 12px', marginBottom: 12,
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
@@ -177,7 +177,7 @@ function GenerateModal({ onClose }) {
         {/* Overwrite warning */}
         {confirmOverwrite && (
           <div style={{
-            background: 'var(--danger-dim)', border: '1px solid rgba(239,68,68,0.25)',
+            background: 'var(--danger-dim)', border: '1px solid rgba(var(--danger-rgb),0.25)',
             borderRadius: 9, padding: '10px 12px', marginBottom: 12,
           }}>
             <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--danger)', marginBottom: 4 }}>
@@ -210,9 +210,9 @@ function ProgramCard({ program }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
           <div style={{
             width: 34, height: 34, borderRadius: 9,
-            background: `${program.color}18`,
-            border: `1px solid ${program.color}30`,
-            color: program.color,
+            background: `rgba(var(--${program.color}-rgb), 0.1)`,
+            border: `1px solid rgba(var(--${program.color}-rgb), 0.2)`,
+            color: `var(--${program.color})`,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: 10, fontWeight: 900, flexShrink: 0,
           }}>
@@ -250,11 +250,11 @@ function ProgramCard({ program }) {
               {program.schedule.map(({ day, focus }) => (
                 <div key={day} style={{
                   textAlign: 'center', padding: '5px 2px', borderRadius: 7,
-                  background: focus === 'Rest' ? 'rgba(255,255,255,0.03)' : `${program.color}10`,
-                  border: `1px solid ${focus === 'Rest' ? 'var(--border)' : program.color + '25'}`,
+                  background: focus === 'Rest' ? 'rgba(255,255,255,0.03)' : `rgba(var(--${program.color}-rgb), 0.06)`,
+                  border: `1px solid ${focus === 'Rest' ? 'var(--border)' : `rgba(var(--${program.color}-rgb), 0.15)`}`,
                 }}>
                   <div style={{ fontSize: 8, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 2 }}>{day}</div>
-                  <div style={{ fontSize: 8, fontWeight: 600, color: focus === 'Rest' ? 'var(--text-dim)' : program.color, lineHeight: 1.2 }}>
+                  <div style={{ fontSize: 8, fontWeight: 600, color: focus === 'Rest' ? 'var(--text-dim)' : `var(--${program.color})`, lineHeight: 1.2 }}>
                     {focus}
                   </div>
                 </div>
@@ -273,7 +273,7 @@ function ProgramCard({ program }) {
 
           <div style={{
             background: 'var(--surface)', borderRadius: 8, padding: '10px 12px',
-            borderLeft: `3px solid ${program.color}`,
+            borderLeft: `3px solid var(--${program.color})`,
             border: '1px solid var(--border)',
           }}>
             <div style={{ fontSize: 9, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 4 }}>
@@ -330,8 +330,8 @@ export default function TrainingPrograms() {
         </div>
       ) : (
         <div style={{
-          background: 'linear-gradient(135deg, rgba(163,230,53,0.08), rgba(163,230,53,0.03))',
-          border: '1px solid rgba(163,230,53,0.2)', borderRadius: 'var(--radius-lg)',
+          background: 'linear-gradient(135deg, rgba(var(--accent-rgb),0.08), rgba(var(--accent-rgb),0.03))',
+          border: '1px solid rgba(var(--accent-rgb),0.2)', borderRadius: 'var(--radius-lg)',
           padding: '16px', marginBottom: 14, textAlign: 'center',
         }}>
           <div style={{ fontSize: 28, marginBottom: 6 }}>⚡</div>
@@ -362,7 +362,7 @@ export default function TrainingPrograms() {
       </div>
 
       {/* Tip Card */}
-      <div className="card card-sm" style={{ borderColor: 'rgba(163,230,53,0.15)', background: 'rgba(163,230,53,0.03)' }}>
+      <div className="card card-sm" style={{ borderColor: 'rgba(var(--accent-rgb),0.15)', background: 'rgba(var(--accent-rgb),0.03)' }}>
         <div style={{ display: 'flex', gap: 10 }}>
           <span style={{ fontSize: 16 }}>💡</span>
           <div>
