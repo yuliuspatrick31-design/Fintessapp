@@ -105,6 +105,8 @@ export default function GymTracker() {
     sets: 3,
     reps: 10,
     weight: 60,
+    is_success: true,
+    rir: 2,
   });
 
   const handleSelectExercise = (ex) => {
@@ -114,8 +116,15 @@ export default function GymTracker() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!form.exercise) return;
-    addGymLog({ ...form, sets: +form.sets, reps: +form.reps, weight: +form.weight });
-    setForm(f => ({ ...f, exercise: '', muscle: '', type: '', sets: 3, reps: 10, weight: 60 }));
+    const volume = (+form.sets) * (+form.reps) * (+form.weight);
+    addGymLog({ 
+      ...form, 
+      sets: +form.sets, 
+      reps: +form.reps, 
+      weight: +form.weight,
+      volume: volume
+    });
+    setForm(f => ({ ...f, exercise: '', muscle: '', type: '', sets: 3, reps: 10, weight: 60, is_success: true, rir: 2 }));
   };
 
   // PR detection: best volume (sets × reps × weight) per exercise
@@ -191,7 +200,7 @@ export default function GymTracker() {
               </div>
             </div>
 
-            <div className="form-row form-row-2" style={{ marginBottom: 12 }}>
+            <div className="form-row form-row-2" style={{ marginBottom: 10 }}>
               <div className="form-group">
                 <label className="form-label">Sets</label>
                 <input
@@ -211,6 +220,35 @@ export default function GymTracker() {
                   min="1" max="100"
                   onChange={e => setForm(f => ({ ...f, reps: e.target.value }))}
                 />
+              </div>
+            </div>
+
+            <div className="form-row form-row-2" style={{ marginBottom: 12 }}>
+              <div className="form-group">
+                <label className="form-label">RIR (Reps in Reserve)</label>
+                <input
+                  type="number"
+                  className="form-input"
+                  value={form.rir}
+                  min="0" max="10"
+                  onChange={e => setForm(f => ({ ...f, rir: +e.target.value }))}
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Target Met?</label>
+                <button
+                  type="button"
+                  onClick={() => setForm(f => ({ ...f, is_success: !f.is_success }))}
+                  style={{
+                    width: '100%', height: 38, borderRadius: 10,
+                    background: form.is_success ? 'rgba(var(--accent-rgb), 0.15)' : 'rgba(var(--danger-rgb), 0.1)',
+                    border: `1px solid ${form.is_success ? 'var(--accent)' : 'var(--danger)'}`,
+                    color: form.is_success ? 'var(--accent)' : 'var(--danger)',
+                    fontSize: 11, fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s',
+                  }}
+                >
+                  {form.is_success ? '✅ SUCCESS' : '❌ FAILED'}
+                </button>
               </div>
             </div>
 

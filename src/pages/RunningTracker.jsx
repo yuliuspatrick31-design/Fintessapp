@@ -11,8 +11,11 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Filler);
 
+import RunningOCRModal from '../components/RunningOCRModal';
+
 export default function RunningTracker() {
   const { runLogs, addRunLog, deleteRunLog } = useApp();
+  const [showOCR, setShowOCR] = useState(false);
 
   const [form, setForm] = useState({
     date: today(),
@@ -88,9 +91,14 @@ export default function RunningTracker() {
 
   return (
     <div>
-      <div className="page-header">
-        <h2>Running Tracker</h2>
-        <p>Log runs, track pace and distance</p>
+      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <h2>Running Tracker</h2>
+          <p>Log runs, track pace and distance</p>
+        </div>
+        <button className="btn btn-secondary btn-sm" onClick={() => setShowOCR(true)}>
+          📸 Scan
+        </button>
       </div>
 
       {/* ── Stats ─────────────────────────────────────────────── */}
@@ -255,6 +263,9 @@ export default function RunningTracker() {
           </div>
         )}
       </div>
+      {showOCR && (
+        <RunningOCRModal onClose={() => setShowOCR(false)} />
+      )}
     </div>
   );
 }

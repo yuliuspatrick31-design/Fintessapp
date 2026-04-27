@@ -147,15 +147,18 @@ const PATTERNS = {
 // Running distances by week (progressive)
 const RUN_DISTANCES = [3, 4, 5, 5];
 
+import { calculateNextLoad } from './progression';
+
 /**
  * Generate a 4-week training schedule
- * @param {string} programId - program key (ppl, ul, 531, arnold, full-body, gzclp)
+ * @param {string} programId - program key
  * @param {string} startDateStr - ISO start date "YYYY-MM-DD"
  * @param {boolean} includeRuns - whether to replace some rest days with runs
  * @param {number} runsPerWeek - how many runs per week (1-3)
+ * @param {Array} historicalLogs - user's past gym logs for smart progression
  * @returns {Array} schedule array
  */
-export function generatePlan(programId, startDateStr, includeRuns = true, runsPerWeek = 2) {
+export function generatePlan(programId, startDateStr, includeRuns = true, runsPerWeek = 2, historicalLogs = []) {
   const pattern = PATTERNS[programId];
   if (!pattern) throw new Error(`Unknown program: ${programId}`);
 
@@ -179,11 +182,16 @@ export function generatePlan(programId, startDateStr, includeRuns = true, runsPe
         date: dateStr,
         type: isGym ? 'gym' : 'rest',
         title: TITLES[workoutKey] || workoutKey,
-        exercises: !isGym ? [] : (EXERCISES[workoutKey] || []).map(ex => ({
-          ...ex,
-          id: crypto.randomUUID(),
-          weight: 0
-        })),
+        exercises: !isGym ? [] : (EXERCISES[workoutKey] || []).map(ex => {
+          // Apply smart progression
+          const recommendation = calculateNextLoad(ex.name, historicalLogs);
+          return {
+            ...ex,
+            id: crypto.randomUUID(),
+            weight: recommendation.weight,
+            recommendation: recommendation.reason // Optional: show why this weight was chosen
+          };
+        }),
         completed: false,
         completedExercises: [],
       });

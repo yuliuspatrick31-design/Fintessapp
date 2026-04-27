@@ -21,7 +21,7 @@ const GOAL_ICON = {
 
 // ── Auto-Generate Plan Modal ──────────────────────────────────
 function GenerateModal({ onClose }) {
-  const { setSchedulePlan, schedule } = useApp();
+  const { setSchedulePlan, schedule, gymLogs } = useApp();
 
   const [programId, setProgramId] = useState('ppl');
   const [startDate, setStartDate] = useState(today());
@@ -37,7 +37,7 @@ function GenerateModal({ onClose }) {
       setConfirmOverwrite(true);
       return;
     }
-    const plan = generatePlan(programId, startDate, includeRuns, runsPerWeek);
+    const plan = generatePlan(programId, startDate, includeRuns, runsPerWeek, gymLogs);
     setSchedulePlan(plan);
     setGenerated(true);
   };

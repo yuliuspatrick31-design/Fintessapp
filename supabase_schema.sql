@@ -15,6 +15,9 @@ create table if not exists public.fit_gym_logs (
   sets        integer,
   reps        integer,
   weight      numeric(8,2),
+  is_success  boolean     default true,
+  rir         integer,
+  volume      numeric(10,2),
   notes       text,
   created_at  timestamptz default now()
 );
