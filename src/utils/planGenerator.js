@@ -172,13 +172,14 @@ export function generatePlan(programId, startDateStr, includeRuns = true, runsPe
       date.setDate(startDay.getDate() + (week * 7) + d);
       const dateStr = date.toISOString().slice(0, 10);
       const workoutKey = pattern[d];
+      const isGym = workoutKey !== 'rest';
       
       weekDays.push({
         id: crypto.randomUUID(),
         date: dateStr,
-        type: workoutKey,
+        type: isGym ? 'gym' : 'rest',
         title: TITLES[workoutKey] || workoutKey,
-        exercises: workoutKey === 'rest' ? [] : (EXERCISES[workoutKey] || []).map(ex => ({
+        exercises: !isGym ? [] : (EXERCISES[workoutKey] || []).map(ex => ({
           ...ex,
           id: crypto.randomUUID(),
           weight: 0
