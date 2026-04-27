@@ -19,6 +19,15 @@ export function AppProvider({ children, userId }) {
   const [schedule,  setSchedule]  = useState([]);
   const [dbReady,   setDbReady]   = useState(false);
 
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem('fittrack_theme') || 'dark';
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('fittrack_theme', theme);
+  }, [theme]);
+
   // ── Bootstrap: fetch all user data on mount ───────────────────
   useEffect(() => {
     if (!userId) return;
@@ -240,7 +249,7 @@ export function AppProvider({ children, userId }) {
 
   return (
     <AppContext.Provider value={{
-      gymLogs, runLogs, exercises, schedule, dbReady,
+      gymLogs, runLogs, exercises, schedule, dbReady, theme, setTheme,
       addGymLog, deleteGymLog,
       addRunLog, deleteRunLog,
       addExercise, updateExercise, deleteExercise,

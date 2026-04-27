@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { MUSCLE_GROUPS, EXERCISE_TYPES, EQUIPMENT_LIST } from '../data/exercises';
 import { totalVolume, today, fmtDate } from '../utils/calculations';
@@ -89,7 +89,13 @@ export default function GymTracker() {
   const { gymLogs, addGymLog, deleteGymLog, exercises } = useApp();
 
   const [showPicker, setShowPicker] = useState(false);
-  const [filterMuscle, setFilterMuscle] = useState('All');
+  const [filterMuscle, setFilterMuscle] = useState(() => {
+    return localStorage.getItem('fittrack_preselect_muscle') || 'All';
+  });
+
+  useEffect(() => {
+    localStorage.removeItem('fittrack_preselect_muscle');
+  }, []);
 
   const [form, setForm] = useState({
     date: today(),

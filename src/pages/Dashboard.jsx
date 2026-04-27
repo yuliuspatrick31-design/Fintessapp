@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import {
   Chart as ChartJS,
   CategoryScale, LinearScale, BarElement, PointElement, LineElement,
@@ -153,11 +153,32 @@ function TodayWorkout({ workout, setPage }) {
   );
 }
 
-function InsightCard({ icon, text, type = 'green' }) {
+function InsightCard({ icon, text, type = 'green', onDismiss, ctaText, onCtaClick }) {
   return (
-    <div className="insight-card">
+    <div className="insight-card" style={{ position: 'relative' }}>
+      {onDismiss && (
+        <button 
+          onClick={onDismiss} 
+          className="btn-ghost" 
+          style={{ position: 'absolute', top: 5, right: 5, padding: '2px 6px', fontSize: 10, color: 'var(--text-muted)' }}
+          title="Dismiss"
+        >
+          ✕
+        </button>
+      )}
       <div className={`icon ${type}`}>{icon}</div>
-      <div className="content"><p>{text}</p></div>
+      <div className="content" style={{ flex: 1, paddingRight: onDismiss ? 16 : 0 }}>
+        <p>{text}</p>
+        {ctaText && (
+          <button 
+            className="btn btn-sm" 
+            onClick={onCtaClick} 
+            style={{ marginTop: 8, background: 'var(--surface-2)', border: '1px solid var(--border)' }}
+          >
+            {ctaText}
+          </button>
+        )}
+      </div>
     </div>
   );
 }
@@ -204,6 +225,32 @@ export default function Dashboard({ setPage }) {
   const { insights, suggestions } = useMemo(
     () => generateInsights(gymLogs, runLogs), [gymLogs, runLogs]
   );
+
+  const [dismissed, setDismissed] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('fittrack_dismissed') || '[]'); } 
+    catch { return []; }
+  });
+
+  const handleDismiss = (text) => {
+    const next = [...dismissed, text];
+    setDismissed(next);
+    localStorage.setItem('fittrack_dismissed', JSON.stringify(next));
+  };
+
+  const isNewUser = gymLogs.length === 0 && runLogs.length === 0;
+
+  const finalSuggestions = useMemo(() => {
+    const active = suggestions.filter(s => !dismissed.includes(s.text));
+    const muscles = active.filter(s => s.isMuscle);
+    const others = active.filter(s => !s.isMuscle);
+
+    muscles.sort((a, b) => {
+      if (a.totalSets !== b.totalSets) return b.totalSets - a.totalSets;
+      return b.daysSince - a.daysSince;
+    });
+
+    return [...muscles.slice(0, 2), ...others];
+  }, [suggestions, dismissed]);
 
   const activeDays = useMemo(() => {
     const dates = new Set([...gymLogs.map(l => l.date), ...runLogs.map(l => l.date)]);
@@ -296,24 +343,45 @@ export default function Dashboard({ setPage }) {
         </div>
       </div>
 
-      {/* Insights */}
-      {(insights.length > 0 || suggestions.length > 0) && (
+      {/* Insights & Suggestions */}
+      {isNewUser ? (
+        <div className="section" style={{ marginTop: 14 }}>
+          <div className="section-title"><span>⚡</span> Getting Started</div>
+          <div 
+            className="card card-glow-lime" 
+            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', padding: '24px 16px', cursor: 'pointer' }} 
+            onClick={() => setPage('gym')}
+          >
+            <div style={{ fontSize: 32, marginBottom: 8 }}>🏋️</div>
+            <h3 style={{ fontSize: 16, fontWeight: 800, color: 'var(--text)', marginBottom: 4 }}>Start your first workout</h3>
+            <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>Pick a muscle group or browse Programs to get started.</p>
+            <button className="btn btn-primary" style={{ marginTop: 16 }}>Go to Gym Tracker →</button>
+          </div>
+        </div>
+      ) : (insights.length > 0 || finalSuggestions.length > 0) ? (
         <div className="section" style={{ marginTop: 14 }}>
           <div className="section-title"><span>⚡</span> Insights & Suggestions</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
             {insights.map((text, i) => (
               <InsightCard key={`ins-${i}`} icon="📊" text={text} type="green" />
             ))}
-            {suggestions.map((s, i) => (
-              <InsightCard key={`sug-${i}`}
+            {finalSuggestions.map((s, i) => (
+              <InsightCard 
+                key={`sug-${i}`}
                 icon={s.type === 'red' ? '⚠️' : s.type === 'warning' ? '🕐' : '💡'}
                 text={s.text}
                 type={s.type === 'red' ? 'red' : s.type === 'warning' ? 'warning' : 'blue'}
+                onDismiss={() => handleDismiss(s.text)}
+                ctaText={s.isMuscle ? `Log ${s.muscle} Set →` : null}
+                onCtaClick={s.isMuscle ? () => {
+                  localStorage.setItem('fittrack_preselect_muscle', s.muscle);
+                  setPage('gym');
+                } : undefined}
               />
             ))}
           </div>
         </div>
-      )}
+      ) : null}
 
       {/* Activity Feed */}
       <div className="section">

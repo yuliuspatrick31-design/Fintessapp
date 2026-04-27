@@ -186,18 +186,25 @@ export function generateInsights(gymLogs, runLogs) {
   // ── Muscle group neglect suggestions ────────────────────
   const allMuscles = ['Chest', 'Back', 'Shoulders', 'Legs', 'Arms', 'Core'];
   for (const muscle of allMuscles) {
-    const lastLog = gymLogs
-      .filter(l => l.muscle === muscle)
-      .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+    const muscleLogs = gymLogs.filter(l => l.muscle === muscle);
+    const lastLog = muscleLogs.sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+    const totalSets = muscleLogs.reduce((sum, l) => sum + l.sets, 0);
 
     if (!lastLog) {
-      suggestions.push({ text: `You haven't logged a ${muscle} workout yet — get started!`, type: 'warning', muscle });
+      suggestions.push({ 
+        text: `You haven't logged a ${muscle} workout yet — get started!`, 
+        type: 'warning', 
+        muscle, 
+        isMuscle: true,
+        daysSince: 9999,
+        totalSets
+      });
     } else {
       const daysSince = Math.floor((now - new Date(lastLog.date).getTime()) / 86400000);
       if (daysSince >= 7) {
-        suggestions.push({ text: `You haven't trained ${muscle} in ${daysSince} days`, type: 'red', muscle });
+        suggestions.push({ text: `You haven't trained ${muscle} in ${daysSince} days`, type: 'red', muscle, isMuscle: true, daysSince, totalSets });
       } else if (daysSince >= 4) {
-        suggestions.push({ text: `${muscle} is due for a session (${daysSince} days ago)`, type: 'warning', muscle });
+        suggestions.push({ text: `${muscle} is due for a session (${daysSince} days ago)`, type: 'warning', muscle, isMuscle: true, daysSince, totalSets });
       }
     }
   }
