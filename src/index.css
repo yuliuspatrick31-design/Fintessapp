@@ -241,7 +241,8 @@ img { display: block; }
 .bottom-nav {
   position: fixed;
   bottom: 0; left: 0; right: 0;
-  height: 56px;
+  height: calc(56px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
   background: var(--bg-card);
   border-top: 1px solid var(--border);
   display: flex;
@@ -698,7 +699,7 @@ select.form-input {
   border-radius: 9px;
   background: var(--surface);
   border: 1px solid var(--border);
-  padding: 5px 4px;
+  padding: 3px 2px;
   cursor: pointer;
   transition: all var(--transition);
   display: flex; flex-direction: column;
@@ -838,15 +839,15 @@ input[type=number] {
 }
 
 /* ── Responsive ────────────────────────────────────────────── */
-@media (min-width: 700px) {
+@media (min-width: 840px) {
   .sidebar { display: flex; }
   .bottom-nav { display: none; }
-  .main-content { padding: 20px 22px; padding-bottom: 20px; }
+  .main-content { padding: 24px 28px; padding-bottom: 24px; }
   .stat-grid { grid-template-columns: repeat(4, 1fr); }
-  .modal-overlay { align-items: center; }
+  .modal-overlay { align-items: center; padding: 20px; }
   .modal { border-radius: var(--radius-xl); max-height: 84dvh; }
-  .cal-cell { max-height: 72px; }
-  .cal-label { font-size: 8.5px; }
+  .cal-cell { max-height: 80px; }
+  .cal-label { font-size: 9px; }
 }
 
 @media (min-width: 900px) {
