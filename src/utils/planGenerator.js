@@ -160,77 +160,59 @@ export function generatePlan(programId, startDateStr, includeRuns = true, runsPe
   if (!pattern) throw new Error(`Unknown program: ${programId}`);
 
   const schedule = [];
-  const startDate = new Date(startDateStr + 'T12:00:00');
+  const startDay = new Date(startDateStr + 'T12:00:00');
 
-  for (let day = 0; day < 28; day++) {
-    const date = new Date(startDate);
-    date.setDate(startDate.getDate() + day);
-    const dateStr = date.toISOString().slice(0, 10);
-
-    const weekNum = Math.floor(day / 7); // 0-3
-    // getDay() returns 0=Sun, so we convert Mon=0..Sun=6
-    const weekday = (date.getDay() + 6) % 7; // Mon=0 ... Sun=6
-    const workoutKey = pattern[weekday];
-
-    let scheduleDay;
-
-    if (workoutKey === 'rest') {
-      // Optionally turn some rest days into running
-      const runsThisWeek = includeRuns
-        ? schedule.filter(d => {
-            const dWeek = Math.floor(
-              (new Date(d.date + 'T12:00:00') - startDate) / (7 * 86400000)
-            );
-            return dWeek === weekNum && d.type === 'run';
-          }).length
-        : 0;
-
-      if (includeRuns && runsThisWeek < runsPerWeek && weekday !== 6) {
-        // Replace rest with run
-        const distance = RUN_DISTANCES[weekNum] || 5;
-        scheduleDay = {
-          id: crypto.randomUUID(),
-          date: dateStr,
-          type: 'run',
-          title: `${distance}km Run`,
-          exercises: [],
-          targetDistance: distance,
-          targetDuration: `${Math.round(distance * 5.5)}:00`, // ~5:30 /km
-          completed: false,
-          completedExercises: [],
-        };
-      } else {
-        scheduleDay = {
-          id: crypto.randomUUID(),
-          date: dateStr,
-          type: 'rest',
-          title: 'Rest Day',
-          exercises: [],
-          completed: false,
-          completedExercises: [],
-        };
-      }
-    } else {
-      // Gym day — assign exercises with unique IDs
-      const exerciseTemplate = EXERCISES[workoutKey] || [];
-      const exercises = exerciseTemplate.map(e => ({
-        ...e,
-        id: crypto.randomUUID(),
-        weight: 0,
-      }));
-
-      scheduleDay = {
+  // We generate 4 weeks
+  for (let week = 0; week < 4; week++) {
+    const weekDays = [];
+    
+    // First, generate the basic 7 days for this week based on the program pattern
+    for (let d = 0; d < 7; d++) {
+      const date = new Date(startDay);
+      date.setDate(startDay.getDate() + (week * 7) + d);
+      const dateStr = date.toISOString().slice(0, 10);
+      const workoutKey = pattern[d];
+      
+      weekDays.push({
         id: crypto.randomUUID(),
         date: dateStr,
-        type: 'gym',
+        type: workoutKey,
         title: TITLES[workoutKey] || workoutKey,
-        exercises,
+        exercises: workoutKey === 'rest' ? [] : (EXERCISES[workoutKey] || []).map(ex => ({
+          ...ex,
+          id: crypto.randomUUID(),
+          weight: 0
+        })),
         completed: false,
         completedExercises: [],
-      };
+      });
     }
 
-    schedule.push(scheduleDay);
+    // Then, if runs are requested, replace rest days with runs
+    if (includeRuns && runsPerWeek > 0) {
+      let runsAdded = 0;
+      // Find all rest days this week
+      const restDayIndices = weekDays
+        .map((day, idx) => day.type === 'rest' ? idx : -1)
+        .filter(idx => idx !== -1);
+
+      // Replace up to runsPerWeek rest days with runs
+      for (const idx of restDayIndices) {
+        if (runsAdded >= runsPerWeek) break;
+        
+        const distance = RUN_DISTANCES[week] || 5;
+        weekDays[idx] = {
+          ...weekDays[idx],
+          type: 'run',
+          title: `${distance}km Run`,
+          targetDistance: distance,
+          targetDuration: `${Math.round(distance * 5.5)}:00`,
+        };
+        runsAdded++;
+      }
+    }
+
+    schedule.push(...weekDays);
   }
 
   return schedule;
