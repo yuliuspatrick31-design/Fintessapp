@@ -100,7 +100,7 @@ function GenerateModal({ onClose }) {
         {/* Selected program preview */}
         {program && (
           <div style={{
-            background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)',
+            background: 'var(--surface-2)', border: '1px solid var(--border)',
             borderLeft: `3px solid var(--${program.color})`,
             borderRadius: 9, padding: '9px 12px', marginBottom: 12,
           }}>
@@ -127,7 +127,7 @@ function GenerateModal({ onClose }) {
 
         {/* Running options */}
         <div style={{
-          background: 'var(--surface)', border: '1px solid var(--border)',
+          background: 'var(--bg-card)', border: '1px solid var(--border-2)',
           borderRadius: 10, padding: '10px 12px', marginBottom: 16,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: includeRuns ? 10 : 0 }}>
